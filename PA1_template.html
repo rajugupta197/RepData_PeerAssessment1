@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Reproducible Research: Peer Assessment 1</title>
+
+<script src="PA1_template_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="PA1_template_files/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="PA1_template_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="PA1_template_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="PA1_template_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="PA1_template_files/navigation-1.1/tabsets.js"></script>
+<link href="PA1_template_files/highlightjs-1.1/default.css" rel="stylesheet" />
+<script src="PA1_template_files/highlightjs-1.1/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Reproducible Research: Peer Assessment 1</h1>
+
+</div>
+
+
+<div id="reproducible-research-week-2-project-1" class="section level1">
+<h1>Reproducible Research: Week-2: Project 1</h1>
+<div id="activity-monitoring-steps-data" class="section level2">
+<h2>Activity Monitoring (Steps) Data</h2>
+<pre class="r"><code>library(ggplot2)</code></pre>
+<div id="loading-and-preprocessing-the-data" class="section level3">
+<h3>Loading and preprocessing the data</h3>
+<pre class="r"><code>#### Downloading the Data File
+f &lt;- &quot;activity.zip&quot;
+
+f1 &lt;- &quot;activity.csv&quot;
+if(!file.exists(f1)) {
+    unzip(f)
+}
+#### Read the Data File 
+if(!exists(&quot;activity&quot;)){
+    activity &lt;- read.csv2(file = f1, header = T, sep = &quot;,&quot;)
+}</code></pre>
+</div>
+<div id="what-is-mean-total-number-of-steps-taken-per-day" class="section level3">
+<h3>What is mean total number of steps taken per day?</h3>
+<pre class="r"><code>stepsperday &lt;- aggregate(activity$steps, list(activity$date), FUN=sum, na.rm = T)
+names(stepsperday) &lt;- c(names(activity)[2], names(activity)[1])</code></pre>
+<div id="histogram-of-the-total-number-of-steps-taken-each-day" class="section level4">
+<h4>Histogram of the total number of steps taken each day</h4>
+<pre class="r"><code>hist(stepsperday$steps, breaks = 22, ylim = c(0, 20), xlim = c(0,22000), col = rep(2:7), xlab = &quot;Steps Per Day&quot;, main = &quot;Histogram of Total Steps taken each Day&quot;)</code></pre>
+<p><img src="PA1_template_files/figure-html/unnamed-chunk-4-1.png" /><!-- --></p>
+</div>
+<div id="mean-and-median-of-the-total-number-of-steps-taken-per-day" class="section level4">
+<h4>Mean and Median of the total number of steps taken per day</h4>
+<pre class="r"><code>MeanStepsPerDay &lt;- mean(stepsperday$steps)
+MedianStepsPerDay &lt;- median(stepsperday$steps)</code></pre>
+<ul>
+<li>Mean: 9354.2295082</li>
+<li>Median: 10395</li>
+</ul>
+</div>
+</div>
+<div id="what-is-the-average-daily-activity-pattern" class="section level3">
+<h3>What is the average daily activity pattern?</h3>
+<div id="time-series-for-each-5-minute-interval-calculating-the-average-number-of-steps-taken-averaged-across-all-days" class="section level4">
+<h4>Time series: For each 5-minute interval calculating the average number of steps taken, averaged across all days</h4>
+<pre class="r"><code>AvgStepsPerInterval &lt;- aggregate(activity$steps, list(activity$interval), FUN=mean, na.rm = T)
+names(AvgStepsPerInterval) &lt;- c(names(activity)[3], &quot;AvgSteps&quot;)
+
+op &lt;- par(mfrow = c(1,1))
+plot(AvgStepsPerInterval$interval, AvgStepsPerInterval$AvgSteps, type = &quot;l&quot;, lwd = 2, main = &quot;Average Number of Steps Per 5-Minute Interval&quot;, xlab = &quot;Interval&quot;, ylab = &quot;Steps&quot;)</code></pre>
+<p><img src="PA1_template_files/figure-html/unnamed-chunk-6-1.png" /><!-- --></p>
+<pre class="r"><code>par(op)</code></pre>
+</div>
+<div id="finding-the-5-minute-interval-having-maximum-number-of-average-steps" class="section level4">
+<h4>Finding the 5-minute interval having maximum number of average steps</h4>
+<pre class="r"><code>MaxInterval &lt;- as.integer(AvgStepsPerInterval[which.max(AvgStepsPerInterval$AvgSteps),][1])
+MaxInterval &lt;- gsub(&quot;([0-9]{1,2})([0-9]{2})&quot;, &quot;\\1:\\2&quot;, MaxInterval)
+MaxSteps &lt;- AvgStepsPerInterval[which.max(AvgStepsPerInterval$AvgSteps),][2]</code></pre>
+<ul>
+<li>Most no of Steps are 206.1698113 at Interval: 8:35</li>
+</ul>
+</div>
+</div>
+<div id="imputing-missing-values" class="section level3">
+<h3>Imputing missing values</h3>
+<div id="total-number-of-missing-values-in-the-dataset-i.e.the-total-number-of-rows-with-nas" class="section level4">
+<h4>Total number of missing values in the dataset (i.e. the total number of rows with NAs)</h4>
+<pre class="r"><code>TotalRowsWithNAs &lt;- sum(!complete.cases(activity))</code></pre>
+<ul>
+<li>Total number of missing values: 2304</li>
+</ul>
+</div>
+<div id="filling-in-missing-values-by-choosing-the-mean-for-that-5-minute-interval" class="section level4">
+<h4>filling in missing values by choosing the mean for that 5-minute interval</h4>
+<pre class="r"><code>NACases &lt;- !complete.cases(activity)
+AvgSteps &lt;- rep(round(AvgStepsPerInterval$AvgSteps),length(levels(activity$date)))</code></pre>
+</div>
+<div id="creating-a-new-dataset-that-is-equal-to-the-original-dataset-but-with-the-missing-data-filled-in" class="section level4">
+<h4>Creating a new dataset that is equal to the original dataset but with the missing data filled in</h4>
+<pre class="r"><code>activityNew &lt;- activity
+activityNew[NACases,][1] &lt;- AvgSteps[NACases]</code></pre>
+</div>
+<div id="calculate-the-total-number-of-steps-taken-per-day" class="section level4">
+<h4>Calculate the total number of steps taken per day</h4>
+<pre class="r"><code>stepsperdayNew &lt;- aggregate(activityNew$steps, list(activityNew$date), FUN=sum)
+names(stepsperdayNew) &lt;- c(names(activityNew)[2], names(activityNew)[1])</code></pre>
+</div>
+<div id="histogram-of-the-total-number-of-steps-taken-each-day-after-imputing" class="section level4">
+<h4>histogram of the total number of steps taken each day (after Imputing)</h4>
+<pre class="r"><code>hist(stepsperdayNew$steps, breaks = 22, ylim = c(0, 20), xlim = c(0,22000), col = rep(2:7), xlab = &quot;Steps Per Day&quot;, main = &quot;Histogram of Total Steps taken each Day (after Imputing)&quot;)</code></pre>
+<p><img src="PA1_template_files/figure-html/unnamed-chunk-12-1.png" /><!-- --></p>
+</div>
+<div id="mean-and-median-of-the-total-number-of-steps-taken-per-day-1" class="section level4">
+<h4>mean and median of the total number of steps taken per day</h4>
+<pre class="r"><code>MeanStepsPerDayNew &lt;- mean(stepsperdayNew$steps)
+MedianStepsPerDayNew &lt;- median(stepsperdayNew$steps)</code></pre>
+<ul>
+<li>Mean (Imputed): 10765.64</li>
+<li>Median (Imputed): 10762</li>
+</ul>
+</div>
+</div>
+<div id="are-there-differences-in-activity-patterns-between-weekdays-and-weekends" class="section level3">
+<h3>Are there differences in activity patterns between weekdays and weekends?</h3>
+<div id="create-a-new-factor-variable-in-the-dataset-with-two-levels---weekday-and-weekend" class="section level4">
+<h4>Create a new factor variable in the dataset with two levels - “weekday” and “weekend”</h4>
+<pre class="r"><code>wkday &lt;- c(&quot;Monday&quot;, &quot;Tuesday&quot;, &quot;Wednesday&quot;, &quot;Thursday&quot;, &quot;Friday&quot;) 
+for(i in 1:nrow(activityNew)){
+    activityNew$day[i] &lt;- if(weekdays(as.Date(activityNew$date[i])) %in% wkday)
+        &quot;weekday&quot; 
+    else 
+        &quot;weekend&quot;
+}
+activityNew$day &lt;- as.factor(as.character(activityNew$day))</code></pre>
+</div>
+<div id="make-a-panel-plot-containing-a-time-series-plot" class="section level4">
+<h4>Make a panel plot containing a time series plot</h4>
+<pre class="r"><code>AvgStepsPerIntervalNew &lt;- aggregate(activityNew$steps, list(activityNew$interval, activityNew$day), FUN=mean)
+names(AvgStepsPerIntervalNew) &lt;- c(names(activityNew)[3], names(activityNew)[4], &quot;AvgSteps&quot;)
+
+library(ggplot2)
+ggplot(AvgStepsPerIntervalNew, aes(x = interval, y=AvgSteps, color=day)) +
+    geom_line() +
+    facet_grid(day ~ .) +
+    labs(title = &quot;Average Number of Steps Per 5-Minute Interval after Imputation&quot;, x = &quot;interval&quot;, y = &quot;steps&quot;)</code></pre>
+<p><img src="PA1_template_files/figure-html/unnamed-chunk-15-1.png" /><!-- --></p>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
